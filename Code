@@ -1,0 +1,88 @@
+✅ main.py
+from models.yolo_model import YOLOModel
+from models.anomaly_detector import AnomalyDetector
+from utils.video_processing import process_video
+from utils.alert_system import send_alert
+
+def main():
+    yolo = YOLOModel()
+    detector = AnomalyDetector()
+    
+    for frame in process_video(0):  # 0 for webcam, or use video path
+        results = yolo.detect(frame)
+        
+        if yolo.detect_threat(results):
+            send_alert("Threat detected: Potential aggression or stalking behavior.")
+        # Future: Add pose analysis, voice recognition, SOS detection
+
+if __name__ == '__main__':
+    main()
+
+
+🧠 models/yolo_model.py
+import torch
+
+class YOLOModel:
+    def __init__(self, model_path='yolov5s.pt'):
+        self.model = torch.hub.load('ultralytics/yolov5', 'yolov5s', pretrained=True)
+
+    def detect(self, frame):
+        return self.model(frame)
+
+    def detect_threat(self, results):
+        people = [x for x in results.xyxy[0] if int(x[-1]) == 0]  # Class 0 = person
+        return len(people) > 3  # Simplified threat condition
+
+⚠️ models/anomaly_detector.py
+from sklearn.svm import OneClassSVM
+import numpy as np
+
+class AnomalyDetector:
+    def __init__(self):
+        self.model = OneClassSVM(gamma='scale', nu=0.1)
+
+    def train(self, features):
+        self.model.fit(features)
+
+    def predict(self, features):
+        return self.model.predict(features)
+
+
+🎥 utils/video_processing.py
+import cv2
+
+def process_video(source):
+    cap = cv2.VideoCapture(source)
+    while cap.isOpened():
+        ret, frame = cap.read()
+        if not ret:
+            break
+        yield frame
+    cap.release()
+
+
+🚨 utils/alert_system.py
+def send_alert(message):
+    print(f'[ALERT] {message}')
+    # TODO: integrate with email/SMS API like Twilio or SMTP
+
+
+
+📦 requirements.txt
+torch
+opencv-python
+ultralytics
+scikit-learn
+
+
+📁 data/sample_dataset_description.txt
+This folder is for pose/gesture/training datasets (e.g., OpenPose outputs or video samples).
+Add CSV or JSON formatted features for anomaly detection here.
+
+
+📜 .gitignore
+__pycache__/
+*.pyc
+.env
+*.pth
+
