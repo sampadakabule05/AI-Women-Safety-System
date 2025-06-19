@@ -61,28 +61,3 @@ def process_video(source):
     cap.release()
 
 
-🚨 utils/alert_system.py
-def send_alert(message):
-    print(f'[ALERT] {message}')
-    # TODO: integrate with email/SMS API like Twilio or SMTP
-
-
-
-📦 requirements.txt
-torch
-opencv-python
-ultralytics
-scikit-learn
-
-
-📁 data/sample_dataset_description.txt
-This folder is for pose/gesture/training datasets (e.g., OpenPose outputs or video samples).
-Add CSV or JSON formatted features for anomaly detection here.
-
-
-📜 .gitignore
-__pycache__/
-*.pyc
-.env
-*.pth
-
